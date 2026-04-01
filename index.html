@@ -66,13 +66,13 @@ body {
 .screen {
   position: absolute;
   inset: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   opacity: 0;
   transform: translateX(100%);
   transition: transform 0.4s var(--ease), opacity 0.4s var(--ease);
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
 }
 .screen.active {
   opacity: 1;
@@ -98,6 +98,8 @@ body {
   display: flex;
   flex-direction: column;
   background: var(--bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .hero-top {
@@ -267,9 +269,8 @@ body {
 .sc-header {
   padding: max(1.4rem, env(safe-area-inset-top)) 1.75rem 0;
   background: var(--bg);
-  position: sticky;
-  top: 0;
   z-index: 10;
+  flex-shrink: 0;
 }
 .sc-back {
   display: inline-flex;
@@ -318,19 +319,17 @@ body {
 }
 
 .sc-body {
-  padding: 1.5rem 1.75rem 7rem;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem 1.75rem 1.5rem;
 }
 
 /* ═══════════════════════════════
    BOTTOM CTA
 ═══════════════════════════════ */
 .sc-cta {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 430px;
+  flex-shrink: 0;
   padding: 0.75rem 1.75rem max(1rem, env(safe-area-inset-bottom));
   background: linear-gradient(to top, var(--bg) 75%, transparent);
   z-index: 20;
@@ -596,7 +595,7 @@ body {
 /* ═══════════════════════════════
    S5: SUCCESS
 ═══════════════════════════════ */
-#s-success { display: flex; flex-direction: column; min-height: 100%; background: var(--bg); }
+#s-success { display: flex; flex-direction: column; min-height: 100%; background: var(--bg); overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .success-top {
   background: linear-gradient(160deg, var(--sage-bg) 0%, var(--bg) 60%);
   padding: 3rem 2rem 2rem;
@@ -689,7 +688,9 @@ body {
 .admin-login-wrap {
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  min-height: 100%; padding: 2rem; text-align: center;
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem; text-align: center;
 }
 .al-icon { font-size: 2.2rem; margin-bottom: 1.25rem; }
 .al-title {
@@ -1001,12 +1002,12 @@ body {
       <div class="field-accent"></div>
     </div>
     <div class="form-field">
-      <label class="field-label">年齢 <span style="font-size:0.63rem;color:var(--muted);">(任意)</span></label>
-      <input class="field-input" id="inp-age" type="number" placeholder="例：35" min="1" max="120" autocomplete="off" style="max-width:120px;">
+      <label class="field-label">年齢<span class="field-req">*</span></label>
+      <input class="field-input" id="inp-age" type="number" placeholder="例：35" min="1" max="120" autocomplete="off" oninput="chkForm()" style="max-width:120px;">
       <div class="field-accent"></div>
     </div>
     <div class="form-field">
-      <label class="field-label">性別 <span style="font-size:0.63rem;color:var(--muted);">(任意)</span></label>
+      <label class="field-label">性別<span class="field-req">*</span></label>
       <div class="gender-row" style="margin-top:0.5rem;">
         <div class="gender-btn" id="g-f" onclick="pickGender('女性')">女性</div>
         <div class="gender-btn" id="g-m" onclick="pickGender('男性')">男性</div>
@@ -1014,8 +1015,8 @@ body {
       </div>
     </div>
     <div class="form-field">
-      <label class="field-label">電話番号 <span style="font-size:0.63rem;color:var(--muted);">(任意)</span></label>
-      <input class="field-input" id="inp-phone" type="tel" placeholder="090-0000-0000" autocomplete="off">
+      <label class="field-label">電話番号<span class="field-req">*</span></label>
+      <input class="field-input" id="inp-phone" type="tel" placeholder="090-0000-0000" autocomplete="off" oninput="chkForm()">
       <div class="field-accent"></div>
     </div>
   </div>
@@ -1045,7 +1046,7 @@ body {
       <div class="confirm-row"><span class="cr-label">電話番号</span><span class="cr-val" id="c-ph">—</span></div>
     </div>
     <div class="confirm-notice">
-      当日は旧社務所にてお受けします。<br>
+      当日は久伊豆神社　旧社務所にて施術いたします。<br>
       お支払いは現金のみとなります。<br>
       お時間の5分前にお越しください。
     </div>
@@ -1251,8 +1252,14 @@ function pickGender(v){
   ['g-f','g-m','g-o'].forEach(id=>document.getElementById(id).classList.remove('selected'));
   const map={'女性':'g-f','男性':'g-m','その他':'g-o'};
   document.getElementById(map[v]).classList.add('selected');
+  chkForm();
 }
-function chkForm(){ document.getElementById('btn-f').disabled=!document.getElementById('inp-name').value.trim(); }
+function chkForm(){
+  const name  = document.getElementById('inp-name').value.trim();
+  const age   = document.getElementById('inp-age').value.trim();
+  const phone = document.getElementById('inp-phone').value.trim();
+  document.getElementById('btn-f').disabled = !(name && age && selGender && phone);
+}
 
 /* ─ Confirm ─ */
 function fillConfirm(){
